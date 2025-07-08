@@ -1,0 +1,3 @@
+# Changelog
+
+[2025-07-08] - Project initialized with Claude Code standards (commit: pending)
