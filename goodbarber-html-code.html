@@ -1,0 +1,92 @@
+<!-- KOPIER ALT UNDER DENNE LINJEN INN I GOODBARBER HTML WIDGET -->
+
+<div id="trafikk-widget" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 10px; background-color: #F0F0F0; color: #000;">
+  <div style="border-radius: 10px; overflow: hidden; background-color: white; box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);">
+    <table style="width: 100%; border-collapse: collapse;">
+      <thead>
+        <tr>
+          <th style="padding: 16px; text-align: left; background-color: #f8f8f8; font-size: 16px;">Strekning</th>
+          <th style="padding: 16px; text-align: right; background-color: #f8f8f8; font-size: 16px;">Forsinking</th>
+        </tr>
+      </thead>
+      <tbody id="traffic-data">
+        <tr>
+          <td colspan="2" style="padding: 20px; text-align: center; color: #888;">Laster trafikkinformasjon...</td>
+        </tr>
+      </tbody>
+    </table>
+    <div id="footer" style="padding: 12px; background-color: #f8f8f8; text-align: left; font-size: 10pt; color: grey;">
+      Kjøretidsmålingar henta frå Statens Vegvesen
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  var API_URL = 'https://datex-trafikk-vercel.vercel.app/api/GetData';
+  var tbody = document.getElementById('traffic-data');
+  var footer = document.getElementById('footer');
+  
+  function getDelayClass(delay) {
+    if (delay <= 0) return 'background-color: #4fc853; color: white;';
+    if (delay < 4) return 'background-color: #ff9800; color: white;';
+    return 'background-color: #ff0000; color: white;';
+  }
+  
+  function formatDelay(delay) {
+    return delay > 0 ? '~ ' + delay + ' MIN' : 'INGEN';
+  }
+  
+  function updateData() {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', API_URL, true);
+    xhr.onreadystatechange = function() {
+      if (xhr.readyState === 4) {
+        if (xhr.status === 200) {
+          try {
+            var response = JSON.parse(xhr.responseText);
+            if (response.success && response.data) {
+              var html = '';
+              for (var i = 0; i < response.data.length; i++) {
+                var item = response.data[i];
+                html += '<tr style="border-bottom: 1px solid #eaeaea;">';
+                html += '<td style="padding: 16px; font-size: 14px;">';
+                html += '<div style="font-size: 16px;"><strong>' + item.stretch + '</strong></div>';
+                html += '<div style="color: #818181; margin-top: 4px;">Nå: ' + item.time_now + ' min | Normalt: ' + item.time_normal + ' min</div>';
+                html += '</td>';
+                html += '<td style="padding: 16px; text-align: right;">';
+                html += '<span style="font-size: 12px; display: inline-block; padding: 4px 10px; border-radius: 12px; font-weight: bold; ' + getDelayClass(item.delay) + '">';
+                html += formatDelay(item.delay);
+                html += '</span>';
+                html += '</td>';
+                html += '</tr>';
+              }
+              tbody.innerHTML = html;
+              
+              if (response.lastModified) {
+                var time = new Date(response.lastModified).toLocaleTimeString('no-NO', {hour: '2-digit', minute: '2-digit'});
+                footer.innerHTML = 'Kjøretidsmålingar henta frå Statens Vegvesen, blir oppdaterte kvart 5. minutt. Sist oppdatert: ' + time;
+              }
+            } else {
+              tbody.innerHTML = '<tr><td colspan="2" style="padding: 20px; text-align: center; color: #ff0000;">Ingen data tilgjengelig</td></tr>';
+            }
+          } catch (e) {
+            tbody.innerHTML = '<tr><td colspan="2" style="padding: 20px; text-align: center; color: #ff0000;">Feil ved lasting av data</td></tr>';
+          }
+        } else {
+          tbody.innerHTML = '<tr><td colspan="2" style="padding: 20px; text-align: center; color: #ff0000;">Kunne ikke laste data</td></tr>';
+        }
+      }
+    };
+    xhr.send();
+  }
+  
+  // Initial load
+  updateData();
+  
+  // Update every 5 minutes
+  setInterval(updateData, 5 * 60 * 1000);
+})();
+</script>
+
+<!-- KOPIER ALT OVER DENNE LINJEN -->
