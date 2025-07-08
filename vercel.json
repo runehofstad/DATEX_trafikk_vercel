@@ -3,5 +3,14 @@
   "env": {
     "NODE_ENV": "production"
   },
-  "regions": ["arn1"]
+  "regions": ["arn1"],
+  "functions": {
+    "api/*.js": {
+      "maxDuration": 10
+    }
+  },
+  "rewrites": [
+    { "source": "/GetData", "destination": "/api/data" },
+    { "source": "/api/GetData", "destination": "/api/data" }
+  ]
 }
