@@ -1,5 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
+module.exports = (req, res) => {
+  const html = `<!DOCTYPE html>
+<html lang="no">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,33 +13,27 @@
       background-color: #F0F0F0;
       color: #000;
     }
-
     .table-container {
       border-radius: 10px;
       overflow: hidden;
       background-color: white;
       box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
     }
-
     table {
       width: 100%;
       border-collapse: collapse;
     }
-
     th, td {
       padding: 16px;
       text-align: left;
     }
-
     th {
       background-color: #f8f8f8;
       font-size: 16px;
     }
-
     td {
       font-size: 14px;
     }
-
     .status {
       font-size:12px;
       display: inline-block;
@@ -46,7 +41,6 @@
       border-radius: 12px;
       font-weight: bold;
     }
-
     .yellow-delay {
       background-color: #ff9800;
       color: white;
@@ -55,12 +49,10 @@
       background-color: #ff0000;
       color: white;
     }
-
     .no-delay {
       background-color: #4fc853;
       color: white;
     }
-
     .tablefooter {
       padding: 12px;
       background-color: #f8f8f8;
@@ -68,7 +60,6 @@
       font-size: 10pt;
       color: grey;
     }
-
     .first_row {
       font-size: 16px;
     }
@@ -86,7 +77,6 @@
   <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
 </head>
 <body>
-
   <div id="widget" class="table-container">
     <table>
       <thead>
@@ -116,7 +106,6 @@
 
   <script>
     const { createApp } = Vue;
-
     createApp({
       data() {
         return {
@@ -127,7 +116,6 @@
       },
       methods: {
         fetchData() {
-          // Kun bruk Vercel API
           fetch('/GetData')
             .then(response => response.json())
             .then(data => {
@@ -150,6 +138,7 @@
             });
         },
         calculateWaitTime(lastModified) {
+          if (!lastModified) return 5000;
           const diff = new Date() - new Date(lastModified.replace(' GMT', ''));
           const min_diff = 5 * 60 * 1000;
           const buffer = 10 * 1000;
@@ -163,7 +152,7 @@
           }
         },
         formatDelay(delay) {
-          return delay ? `~ ${delay} MIN` : 'INGEN';
+          return delay ? \`~ \${delay} MIN\` : 'INGEN';
         }
       },
       computed: {
@@ -172,19 +161,18 @@
         }
       },
       mounted() {
-        // Fetch the initial data when the component is mounted
         this.fetchData();
-
-        // Listen to visibility change events to handle foreground/background status
         document.addEventListener('visibilitychange', this.handleVisibilityChange);
       },
       beforeUnmount() {
-        // Cleanup the event listener when the component is unmounted
         document.removeEventListener('visibilitychange', this.handleVisibilityChange);
-        clearTimeout(this.fetchTimeout); // Ensure no timeouts remain
+        clearTimeout(this.fetchTimeout);
       }
     }).mount('#widget');
   </script>
-
 </body>
-</html>
+</html>`;
+  
+  res.setHeader('Content-Type', 'text/html');
+  res.status(200).send(html);
+};
