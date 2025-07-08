@@ -27,4 +27,4 @@ Serveren kjører på http://localhost:3200
 
 ## Deployment
 
-Push til main branch vil automatisk deploye til Vercel.
+Push til main branch vil automatisk deploye til Vercel.# Trigger deployment
