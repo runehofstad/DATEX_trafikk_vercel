@@ -32,6 +32,9 @@ const logger = winston.createLogger({
 const app = express();
 app.use(cors());
 
+// Serve static files
+app.use(express.static(__dirname));
+
 const API_URL =
   "https://datex-server-get-v3-1.atlas.vegvesen.no/datexapi/GetTravelTimeData/pullsnapshotdata";
 const API_USERNAME = process.env.API_USERNAME;
@@ -269,6 +272,11 @@ app.get("/GetData", async (req, res) => {
     success: false,
     error: "No cached data available",
   });
+});
+
+// Serve index.html for root
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 const PORT = process.env.PORT || 3200;
