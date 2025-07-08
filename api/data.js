@@ -141,6 +141,20 @@ async function fetchDataFromAPI() {
 }
 
 module.exports = async (req, res) => {
+  // Debug mode check
+  if (req.query.debug === 'true') {
+    return res.status(200).json({
+      debug: true,
+      env: {
+        hasUsername: !!process.env.API_USERNAME,
+        hasPassword: !!process.env.API_PASSWORD,
+        usernameLength: process.env.API_USERNAME ? process.env.API_USERNAME.length : 0,
+        nodeEnv: process.env.NODE_ENV
+      },
+      timestamp: new Date().toISOString()
+    });
+  }
+
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -174,9 +188,14 @@ module.exports = async (req, res) => {
     });
   }
 
-  // No data available
+  // No data available - return more info
   return res.status(200).json({
     success: false,
-    error: "No cached data available"
+    error: "No cached data available",
+    apiResponse: apiResponse,
+    debug: {
+      hasCredentials: !!(API_USERNAME && API_PASSWORD),
+      timestamp: new Date().toISOString()
+    }
   });
 };
