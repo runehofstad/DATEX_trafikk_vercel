@@ -35,21 +35,16 @@ app.use(cors());
 // Serve static files
 app.use(express.static(path.join(__dirname)));
 
-// Specific routes for HTML files
-app.get('/test-api.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'test-api.html'));
-});
-
-app.get('/goodbarber-original.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'goodbarber-original.html'));
-});
-
-app.get('/goodbarber-widget.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'goodbarber-widget.html'));
-});
-
-app.get('/widget.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'widget.html'));
+// Debug endpoint to check if files exist
+app.get('/debug-files', (req, res) => {
+  const files = {
+    'index.html': fs.existsSync(path.join(__dirname, 'index.html')),
+    'test-api.html': fs.existsSync(path.join(__dirname, 'test-api.html')),
+    'goodbarber-original.html': fs.existsSync(path.join(__dirname, 'goodbarber-original.html')),
+    '__dirname': __dirname,
+    'cwd': process.cwd()
+  };
+  res.json(files);
 });
 
 const API_URL =
@@ -294,6 +289,19 @@ app.get("/GetData", async (req, res) => {
 // Serve index.html for root
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// Add a test endpoint
+app.get('/test', (req, res) => {
+  res.json({
+    status: 'Server is running',
+    time: new Date().toISOString(),
+    env: {
+      hasUsername: !!process.env.API_USERNAME,
+      hasPassword: !!process.env.API_PASSWORD,
+      nodeEnv: process.env.NODE_ENV
+    }
+  });
 });
 
 const PORT = process.env.PORT || 3200;
