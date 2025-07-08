@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Øygarden Trafikk Widget</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background-color: transparent;
+      color: #000;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .widget-container {
+      background-color: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      margin: 8px;
+    }
+
+    .widget-header {
+      background-color: #007AFF;
+      color: white;
+      padding: 12px 16px;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .traffic-item {
+      padding: 16px;
+      border-bottom: 1px solid #E5E5EA;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .traffic-item:last-child {
+      border-bottom: none;
+    }
+
+    .stretch-info {
+      flex: 1;
+    }
+
+    .stretch-name {
+      font-size: 16px;
+      font-weight: 500;
+      color: #000;
+      margin-bottom: 4px;
+    }
+
+    .time-info {
+      font-size: 13px;
+      color: #6C6C70;
+    }
+
+    .delay-badge {
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 16px;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .no-delay {
+      background-color: #34C759;
+      color: white;
+    }
+
+    .yellow-delay {
+      background-color: #FF9500;
+      color: white;
+    }
+
+    .red-delay {
+      background-color: #FF3B30;
+      color: white;
+    }
+
+    .widget-footer {
+      padding: 12px 16px;
+      background-color: #F2F2F7;
+      font-size: 11px;
+      color: #8E8E93;
+      text-align: center;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #8E8E93;
+    }
+
+    .error {
+      text-align: center;
+      padding: 40px;
+      color: #FF3B30;
+    }
+
+    /* Dark mode support */
+    @media (prefers-color-scheme: dark) {
+      body {
+        color: #fff;
+      }
+      
+      .widget-container {
+        background-color: #1C1C1E;
+      }
+      
+      .traffic-item {
+        border-bottom-color: #38383A;
+      }
+      
+      .stretch-name {
+        color: #fff;
+      }
+      
+      .time-info {
+        color: #AEAEB2;
+      }
+      
+      .widget-footer {
+        background-color: #2C2C2E;
+        color: #AEAEB2;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+
+  <script>
+    const API_URL = 'https://datex-trafikk-vercel-kdz9gy9xj-studioxas.vercel.app/GetTravelTimeData';
+    
+    async function fetchTrafficData() {
+      try {
+        const response = await fetch(API_URL);
+        if (!response.ok) throw new Error('Failed to fetch data');
+        return await response.json();
+      } catch (error) {
+        console.error('Error:', error);
+        throw error;
+      }
+    }
+
+    function formatDelay(delay) {
+      if (delay <= 0) return 'Ingen';
+      return `~${delay} min`;
+    }
+
+    function getDelayClass(delay) {
+      if (delay <= 0) return 'no-delay';
+      if (delay < 4) return 'yellow-delay';
+      return 'red-delay';
+    }
+
+    function formatTime(dateString) {
+      if (!dateString) return '';
+      const date = new Date(dateString);
+      return date.toLocaleTimeString('no-NO', { 
+        hour: '2-digit', 
+        minute: '2-digit' 
+      });
+    }
+
+    function renderWidget(data) {
+      const app = document.getElementById('app');
+      
+      if (!data || !data.data) {
+        app.innerHTML = '<div class="widget-container"><div class="error">Kunne ikke laste data</div></div>';
+        return;
+      }
+
+      const html = `
+        <div class="widget-container">
+          <div class="widget-header">Trafikkinformasjon Øygarden</div>
+          ${data.data.map(item => `
+            <div class="traffic-item">
+              <div class="stretch-info">
+                <div class="stretch-name">${item.stretch}</div>
+                <div class="time-info">Nå: ${item.time_now} min • Normalt: ${item.time_normal} min</div>
+              </div>
+              <div class="delay-badge ${getDelayClass(item.delay)}">
+                ${formatDelay(item.delay)}
+              </div>
+            </div>
+          `).join('')}
+          <div class="widget-footer">
+            Oppdatert: ${formatTime(data.lastModified)} • Data fra Statens vegvesen
+          </div>
+        </div>
+      `;
+      
+      app.innerHTML = html;
+    }
+
+    function renderLoading() {
+      const app = document.getElementById('app');
+      app.innerHTML = '<div class="widget-container"><div class="loading">Laster trafikkinformasjon...</div></div>';
+    }
+
+    function renderError() {
+      const app = document.getElementById('app');
+      app.innerHTML = '<div class="widget-container"><div class="error">Kunne ikke laste trafikkinformasjon</div></div>';
+    }
+
+    // Initial load
+    async function init() {
+      renderLoading();
+      try {
+        const data = await fetchTrafficData();
+        renderWidget(data);
+        
+        // Auto-refresh every 5 minutes
+        setInterval(async () => {
+          try {
+            const newData = await fetchTrafficData();
+            renderWidget(newData);
+          } catch (error) {
+            console.error('Refresh error:', error);
+          }
+        }, 5 * 60 * 1000);
+        
+      } catch (error) {
+        renderError();
+      }
+    }
+
+    // Start when DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+  </script>
+</body>
+</html>
