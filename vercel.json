@@ -15,10 +15,5 @@
   "env": {
     "NODE_ENV": "production"
   },
-  "regions": ["arn1"],
-  "functions": {
-    "server.js": {
-      "maxDuration": 60
-    }
-  }
+  "regions": ["arn1"]
 }
