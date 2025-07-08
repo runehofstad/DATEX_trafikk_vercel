@@ -1,5 +1,7 @@
 # DATEX Trafikk - Vercel Version
 
+[![Deployed on Vercel](https://vercel.com/button)](https://vercel.com)
+
 Node.js proxy server for Vegvesens DATEX API - optimalisert for Vercel deployment.
 
 ## Miljøvariabler
