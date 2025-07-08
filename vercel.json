@@ -4,28 +4,12 @@
     {
       "src": "server.js",
       "use": "@vercel/node"
-    },
-    {
-      "src": "*.html",
-      "use": "@vercel/static"
     }
   ],
   "routes": [
     {
-      "src": "/GetData",
+      "src": "/(.*)",
       "dest": "/server.js"
-    },
-    {
-      "src": "/GetTravelTimeData",
-      "dest": "/server.js"
-    },
-    {
-      "src": "/(.*\\.html)",
-      "dest": "/$1"
-    },
-    {
-      "src": "/",
-      "dest": "/index.html"
     }
   ],
   "env": {

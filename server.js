@@ -33,7 +33,24 @@ const app = express();
 app.use(cors());
 
 // Serve static files
-app.use(express.static(__dirname));
+app.use(express.static(path.join(__dirname)));
+
+// Specific routes for HTML files
+app.get('/test-api.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'test-api.html'));
+});
+
+app.get('/goodbarber-original.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'goodbarber-original.html'));
+});
+
+app.get('/goodbarber-widget.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'goodbarber-widget.html'));
+});
+
+app.get('/widget.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'widget.html'));
+});
 
 const API_URL =
   "https://datex-server-get-v3-1.atlas.vegvesen.no/datexapi/GetTravelTimeData/pullsnapshotdata";
