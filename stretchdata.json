@@ -1,0 +1,12 @@
+[
+  {
+    "id": 1,
+    "stretch": "Straume - Lyderhorntunnelen",
+    "stretchIDs": ["100277", "100176", "100156"]
+  },
+  {
+    "id": 2,
+    "stretch": "Lyderhorntunnelen - Straume",
+    "stretchIDs": ["100153", "100173", "100274"]
+  }
+]

@@ -1,0 +1,46 @@
+[
+  {
+    "location_id": "100153",
+    "travel_time": "208.0",
+    "free_flow_time": "120.0",
+    "travel_time_trend_type": "decreasing"
+  },
+  {
+    "location_id": "100156",
+    "travel_time": "126.0",
+    "free_flow_time": "120.0",
+    "travel_time_trend_type": "stable"
+  },
+  {
+    "location_id": "100173",
+    "travel_time": "326.0",
+    "free_flow_time": "180.0",
+    "travel_time_trend_type": "stable"
+  },
+  {
+    "location_id": "100176",
+    "travel_time": "346.0",
+    "free_flow_time": "180.0",
+    "travel_time_trend_type": "stable"
+  },
+  {
+    "location_id": "100275",
+    "free_flow_time": "120.0"
+  },
+  {
+    "location_id": "100274",
+    "travel_time": "217.0",
+    "free_flow_time": "120.0",
+    "travel_time_trend_type": "stable"
+  },
+  {
+    "location_id": "100277",
+    "travel_time": "231.0",
+    "free_flow_time": "120.0",
+    "travel_time_trend_type": "stable"
+  },
+  {
+    "location_id": "100276",
+    "free_flow_time": "120.0"
+  }
+]
