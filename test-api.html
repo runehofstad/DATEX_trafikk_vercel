@@ -47,27 +47,24 @@
     // Test 1: Vercel API
     addTest('Testing Vercel API...', 'pending', {status: 'testing'});
     
-    fetch('https://datex-trafikk-vercel.vercel.app/GetData')
+    fetch('/GetData')
       .then(res => res.json())
       .then(data => {
         if (data.success) {
-          addTest('Vercel API', 'success', data);
+          addTest('Vercel API - Success!', 'success', data);
         } else {
-          addTest('Vercel API', 'error', data);
-          
-          // Test 2: Heroku API as fallback
-          addTest('Testing Heroku API as fallback...', 'pending', {status: 'testing'});
-          return fetch('https://datextraffic-7ab2df273654.herokuapp.com/GetData');
-        }
-      })
-      .then(res => res && res.json())
-      .then(data => {
-        if (data) {
-          addTest('Heroku API', 'success', data);
+          addTest('Vercel API - No data yet', 'error', data);
         }
       })
       .catch(err => {
         addTest('Error', 'error', {error: err.message});
+      });
+    
+    // Test 2: Direct API call with debug
+    fetch('/GetData?debug=true')
+      .then(res => res.json())
+      .then(data => {
+        addTest('Debug Info', data.success ? 'success' : 'error', data);
       });
 
     // Test environment

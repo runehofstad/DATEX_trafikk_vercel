@@ -127,37 +127,26 @@
       },
       methods: {
         fetchData() {
-          // Prøv først Vercel, hvis det feiler prøv Heroku
-          fetch('https://datex-trafikk-vercel.vercel.app/GetData')
-            .then(response => {
-              if (!response.ok) {
-                // Fallback til Heroku hvis Vercel feiler
-                return fetch('https://datextraffic-7ab2df273654.herokuapp.com/GetData');
-              }
-              return response;
-            })
+          // Kun bruk Vercel API
+          fetch('/GetData')
             .then(response => response.json())
             .then(data => {
-              this.lastModified = data.lastModified;
-              const wait = this.calculateWaitTime(this.lastModified);
-              clearTimeout(this.fetchTimeout);
-              if (document.visibilityState === 'visible') {
-                this.fetchTimeout = setTimeout(() => {
-                  this.fetchData();
-                }, wait);
+              if (data.success && data.data) {
+                this.lastModified = data.lastModified;
+                const wait = this.calculateWaitTime(this.lastModified);
+                clearTimeout(this.fetchTimeout);
+                if (document.visibilityState === 'visible') {
+                  this.fetchTimeout = setTimeout(() => {
+                    this.fetchData();
+                  }, wait);
+                }
+                this.trafficData = [...data.data];
+              } else {
+                console.error('No data available:', data);
               }
-              this.trafficData = [...data.data];
             })
             .catch(error => {
               console.error('Error fetching data:', error);
-              // Prøv Heroku som siste utvei
-              fetch('https://datextraffic-7ab2df273654.herokuapp.com/GetData')
-                .then(response => response.json())
-                .then(data => {
-                  this.lastModified = data.lastModified;
-                  this.trafficData = [...data.data];
-                })
-                .catch(err => console.error('All APIs failed:', err));
             });
         },
         calculateWaitTime(lastModified) {
